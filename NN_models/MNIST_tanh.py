@@ -21,7 +21,7 @@ class APX_TANH(Module):
         return ops.tanh_apx(input,self.file_name)
 def train_test(training,file_name):
 	transform = transforms.Compose([transforms.ToTensor(),
-								   transforms.Normalize(mean=[0.5,0.5,0.5],std=[0.5,0.5,0.5])])
+								   transforms.Normalize((0.5,), (0.5,))])#mean=[0.5,0.5,0.5],std=[0.5,0.5,0.5])
 	data_train = datasets.MNIST(root = os.path.join('NN_models','data/'),
 								transform=transform,
 								train = True,
