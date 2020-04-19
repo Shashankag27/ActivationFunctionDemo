@@ -81,17 +81,17 @@ Implement tanh in [0,2], output: 1 bit for integer part, 6 bits for the decimal 
 
 Simulate the activation function in software and plot the figure of it:
 
-	python main.py tanh 0 2 1 6 4 -Simulate=True
+	python main.py tanh 0 2 1 6 4 -simulate=True
 
-Implement selu in [-3.875,0], output: 1 bit for integer part, 6 bits for the decimal part, input: 4 bits
+Implement selu in [-3.875,0], output: 1 bit for integer part, 7 bits for the decimal part, input: 5 bits
 
-	python main.py tanh -3.875 0 1 6 4
+	python main.py selu -3.875 0 1 7 5
 
 After Implementation, you can find the verilog file in path:AF\_implementation\\verilog_file and the name rule is:
 
 AF\_(integer bit width of outputs)\_(decimal bit width of outputs)\_(input bit width).v
 
-Example: tanh\_1\_4\_4.v
+(Example: tanh\_1\_6\_4.v)
 
 
 
