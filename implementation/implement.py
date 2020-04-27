@@ -1,5 +1,6 @@
 import platform
 import numpy as np
+import torch
 import matplotlib.pyplot as plt
 import pickle
 import NN_models.MNIST_tanh as M_tanh
@@ -15,11 +16,13 @@ import os
 if(platform.system() == 'Windows'):
     from pywinauto.application import Application
 #here to add your own AF
-
+torch.set_default_tensor_type('torch.cuda.FloatTensor')
 def self_define(x):
     x = np.array(x)
-    return x
-
+    scale = 1.0507009873554804934193349852946
+    z = 1/(1 + np.exp(-x)) 
+    out = scale * np.where(x > 2.0, x, x * z)
+    return out
 
 def selu(x, name="selu"):
     x = np.array(x)
@@ -264,7 +267,7 @@ def MNIST_retrain(args):
     if(args.AF == 'selu'):
         M_selu.train_test(True,file_name)
     if (args.AF == 'self_define'):
-        M_self_define.train_test(True,self_define,file_name)
+        M_self_define.train_test(True,file_name)#(True,self_define,file_name)
 def CIFAR_retrain(args):
     file_name = args.AF + '_' + str(args.int_bits) + '_' + str(args.float_bits) + '_' + str(args.i_bits)
     if (args.AF == 'tanh'):
@@ -321,8 +324,11 @@ def implemet_AF(args):
         x_linspace = [-1 * x for x in reversed(x_linspace)] + x_linspace
         valus = [-1 * x for x in reversed(valus)] + valus
     if (AF == 'self_define'):
-        x_linspace = [-1 * x for x in reversed(x_linspace)] + x_linspace
-        valus = [-1 * x for x in reversed(valus)] + valus
+        #x_linspace = [-1 * x for x in reversed(x_linspace)] + x_linspace
+        #valus = [-1 * x for x in reversed(valus)] + valus
+		    x_linspace = x_linspace
+		    valus = valus
+		 
     output = open(os.path.join('process_data',file_name+'.pkl'), 'wb')
     pickle.dump(x_linspace, output)
     pickle.dump(valus, output)
