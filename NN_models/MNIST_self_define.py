@@ -31,8 +31,7 @@ class SELF_DEFINE_APX(Module):
         return ops.self_define_torch_apx(input,self.file_name)
 
 def train_test(training,file_name):
-	transform = transforms.Compose([transforms.ToTensor(),
-								   transforms.Normalize((0.5,), (0.5,))])
+	transform = transforms.Compose([transforms.ToTensor(), transforms.Normalize((0.5,), (0.5,))])
 	data_train = datasets.MNIST(root = os.path.join('NN_models','data/'),
 								transform=transform,
 								train = True,
@@ -41,13 +40,9 @@ def train_test(training,file_name):
 	data_test = datasets.MNIST(root=os.path.join('NN_models','data/'),
 							   transform = transform,
 							   train = False)
-	data_loader_train = torch.utils.data.DataLoader(dataset=data_train,
-													batch_size = 64,
-													shuffle = True)
+	data_loader_train = torch.utils.data.DataLoader(dataset=data_train, batch_size = 64, shuffle = True)
 
-	data_loader_test = torch.utils.data.DataLoader(dataset=data_test,
-												   batch_size = 64,
-												   shuffle = True)
+	data_loader_test = torch.utils.data.DataLoader(dataset=data_test, batch_size = 64, shuffle = True)
 
 
 	class Net(nn.Module):
