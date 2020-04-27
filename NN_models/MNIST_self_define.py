@@ -12,9 +12,27 @@ import os
 import numpy as np
 import math
 import NN_models.ops as ops
-def train_test(training):
+
+class SELF_DEFINE(Module):
+    def __init__(self, inplace=False):
+        super(SELF_DEFINE, self).__init__()
+        self.inplace = inplace
+
+    def forward(self, input):
+        return ops.self_define_torch(input)   
+
+class SELF_DEFINE_APX(Module):
+    def __init__(self,file_name,inplace=False):
+        super(SELF_DEFINE_APX, self).__init__()
+        self.inplace = inplace
+        self.file_name = file_name
+
+    def forward(self, input):
+        return ops.self_define_torch_apx(input,self.file_name)
+
+def train_test(training,file_name):
 	transform = transforms.Compose([transforms.ToTensor(),
-								   transforms.Normalize(mean=[0.5,0.5,0.5],std=[0.5,0.5,0.5])])
+								   transforms.Normalize((0.5,), (0.5,))])
 	data_train = datasets.MNIST(root = os.path.join('NN_models','data/'),
 								transform=transform,
 								train = True,
@@ -42,19 +60,19 @@ def train_test(training):
 			self.fc3 = nn.Linear(84,10)
 
 		def forward(self,x):
-			x = F.max_pool2d(self_define_torch(self.cov1(x)),(2,2))
-			x = F.max_pool2d(self_define_torch(self.cov2(x)),(2,2))
+			x = F.max_pool2d(ops.self_define_torch(self.cov1(x)),(2,2))
+			x = F.max_pool2d(ops.self_define_torch(self.cov2(x)),(2,2))
 			x = x.view(-1,16*4*4)
-			x = self_define_torch(self.fc1(x))
-			x = self_define_torch(self.fc2(x))
+			x = ops.self_define_torch(self.fc1(x))
+			x = ops.self_define_torch(self.fc2(x))
 			x = self.fc3(x)
 			return x
 		def forward_apx(self,x):
-			x = F.max_pool2d(ops.self_define_torch(self.cov1(x)), (2, 2))
-			x = F.max_pool2d(ops.self_define_torch(self.cov2(x)), (2, 2))
+			x = F.max_pool2d(ops.self_define_torch_apx(self.cov1(x),file_name), (2, 2))
+			x = F.max_pool2d(ops.self_define_torch_apx(self.cov2(x),file_name), (2, 2))
 			x = x.view(-1, 16 * 4 * 4)
-			x = ops.self_define_torch(self.fc1(x))
-			x = ops.self_define_torch(self.fc2(x))
+			x = ops.self_define_torch_apx(self.fc1(x),file_name)
+			x = ops.self_define_torch_apx(self.fc2(x),file_name)
 			x = self.fc3(x)
 			return x
 
@@ -86,7 +104,7 @@ def train_test(training):
 			outputs = net.forward(Variable(images).cuda())
 			_, predicted = torch.max(outputs.data, 1)
 			total += labels.size(0)
-			correct += np.sum((predicted==labels).numpy())
+			correct += np.sum((predicted==labels).cpu().numpy())
 		print('Accuracy of the network on the 10000 test images: %f' % (correct / total))
 		acc1 = str(correct / total)
 		correct = 0
@@ -96,9 +114,10 @@ def train_test(training):
 			outputs = net.forward_apx(Variable(images).cuda())
 			_, predicted = torch.max(outputs.data, 1)
 			total += labels.size(0)
-			correct += np.sum((predicted==labels).numpy())
+			correct += np.sum((predicted==labels).cpu().numpy())
 		print('apx Accuracy of the network on the 10000 test images: %f' % (correct / total))
-		with open(os.path.join('NN_models','Acc', 'MNIST_acc.txt'), 'a') as f:
+		acc2 = str(correct / total)
+		with open(os.path.join('NN_models','Acc','MNIST_acc.txt'), 'a') as f:
 			f.write(file_name + ' ')
 			f.write(acc1 + ' ')
 			f.write(acc2 + ' \r\n')
